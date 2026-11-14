@@ -28,7 +28,25 @@ public class PhotoLevelManager : MonoBehaviour
 
     void Start()
     {
+        // Put the ball on whichever level is set as the start, so changing Start Level
+        // in the Inspector is all it takes to begin somewhere else.
+        var ball = PhotoBall.Instance;
+        if (ball != null && Current != null) PlaceBall(ball, Current, Current.spawn != null ? Current.spawn : Current.transform);
+    }
+
+    void PlaceBall(PhotoBall ball, PhotoLevelArea level, Transform spawnPoint)
+    {
+        Current = level;
         ApplyJumpHeight();
+        ball.SnapScale(level.spawnScale);
+        Vector3 position = spawnPoint.position;
+        position.z = ball.transform.position.z;
+        ball.transform.position = position;
+        ball.GetComponent<Rigidbody>().position = position;
+
+        // Make the camera cut to the new place instead of flying over to it.
+        foreach (var cam in FindObjectsByType<CinemachineCamera>(FindObjectsSortMode.None))
+            cam.PreviousStateIsValid = false;
     }
 
     void ApplyJumpHeight()
@@ -44,11 +62,14 @@ public class PhotoLevelManager : MonoBehaviour
         if (Instance == this) Instance = null;
     }
 
-    /// <summary>Fade to black and move the ball to the given level's spawn point.</summary>
+    /// <summary>
+    /// Fade to black and move the ball to the given level's spawn point. The level may be
+    /// the one the ball is already in, which just puts it back on the spawn point.
+    /// </summary>
     public void GoTo(PhotoLevelArea level, Transform spawnPoint = null)
     {
         var ball = PhotoBall.Instance;
-        if (transitioning || ball == null || level == null || level == Current) return;
+        if (transitioning || ball == null || level == null) return;
         if (spawnPoint == null) spawnPoint = level.spawn != null ? level.spawn : level.transform;
         StartCoroutine(Travel(level, spawnPoint, ball));
     }
@@ -80,17 +101,7 @@ public class PhotoLevelManager : MonoBehaviour
             yield return null;
         }
 
-        Current = level;
-        ApplyJumpHeight();
-        ball.SnapScale(level.spawnScale);
-        Vector3 position = spawnPoint.position;
-        position.z = ball.transform.position.z;
-        ball.transform.position = position;
-        body.position = position;
-
-        // Make the camera cut to the new level instead of flying over to it.
-        foreach (var cam in FindObjectsByType<CinemachineCamera>(FindObjectsSortMode.None))
-            cam.PreviousStateIsValid = false;
+        PlaceBall(ball, level, spawnPoint);
 
         yield return null;
         yield return null;

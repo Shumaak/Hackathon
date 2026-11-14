@@ -18,7 +18,7 @@ using UnityEngine;
 /// Levels 2-4 (rails): along the top of the mesh railing; off the right edge goes to the next
 /// photo, off the left edge goes back to the previous one.
 /// Levels 5-9 (lamps): hop from the left big lamp to the right one, which leads to the next
-/// photo; falling drops back to level 1. From the last lamp you can reach the blue rail.
+/// photo; falling drops back to the first lamp photo. From the last lamp you can reach the blue rail.
 ///
 /// Coordinates are pixels on the photo scaled to the size given to Level(), x from the left,
 /// y from the TOP, exactly as an image editor shows them. Ball scale 1 means BallSize metres
@@ -157,7 +157,7 @@ public static class PhotoLevelBuilder
         // Each photo has two big lamps with smaller ones between them. The ball starts on the
         // left big lamp ("Lamp Start") and hops across; landing on the right big lamp
         // ("Lamp End") moves on to the next photo, where that lamp is the start. There is
-        // no floor: miss a lamp and you fall back to level 1.
+        // no floor: miss a lamp and you fall back to the first lamp photo (level 5).
         //     name                    x0    x1    top   ball scale
         var lamps1 = Level("Level 5 - Lamps", "Assets/Photos/IMG_2235.png", 1600, 1200, 100, 367, 465, 1.3f);
         Ledge("Lamp Start",            285,  450,  465,  1.3f);
@@ -223,11 +223,9 @@ public static class PhotoLevelBuilder
         foreach (var lamps in new[] { lamps1, lamps2, lamps3, lamps4, lamps5 }) lamps.jumpHeight = 2f;   // same boost as the rail photos
 
         var levels = new[] { bar, rail1, rail2, rail3, lamps1, lamps2, lamps3, lamps4, lamps5 };
-        foreach (var level in levels)
-        {
-            if (level != bar) level.below = bar;   // falling out sends you back to the start
-            Seal(level);
-        }
+        foreach (var rail in new[] { rail1, rail2, rail3 }) rail.below = bar;                              // falling out of a rail photo: back to the bar
+        foreach (var lamps in new[] { lamps1, lamps2, lamps3, lamps4, lamps5 }) lamps.below = lamps1;     // missing a lamp: back to the first lamp photo
+        foreach (var level in levels) Seal(level);
 
         rootGo.AddComponent<PhotoLevelManager>().SetStartLevel(bar);
         PlacePlayer(bar);

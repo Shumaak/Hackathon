@@ -50,7 +50,7 @@ public class PhotoBall : MonoBehaviour
             if (collision.GetContact(i).normal.y > 0.5f)
             {
                 targetScale = surface.ballScale;
-                if (surface.leadsTo != null && PhotoLevelManager.Instance != null)
+                if (surface.leadsTo != null && surface.leadsTo != PhotoLevelManager.Current && PhotoLevelManager.Instance != null)
                     PhotoLevelManager.Instance.GoTo(surface.leadsTo);
                 return;
             }
