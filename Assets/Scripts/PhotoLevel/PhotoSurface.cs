@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 /// <summary>
 /// An invisible collider traced over something in a photo (a counter, a rail, a lamp).
@@ -13,6 +14,8 @@ public class PhotoSurface : MonoBehaviour
     public bool oneWay;
     [Tooltip("Landing on this surface sends the ball to that level.")]
     public PhotoLevelArea leadsTo;
+    public UnityEvent OnCollision;
+
 
     Collider col;
     bool ignoring;

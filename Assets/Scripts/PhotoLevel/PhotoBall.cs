@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 /// <summary>
 /// Goes on the ball. Resizes it to the ballScale of whatever PhotoSurface it is standing on,
@@ -52,6 +53,7 @@ public class PhotoBall : MonoBehaviour
                 targetScale = surface.ballScale;
                 if (surface.leadsTo != null && surface.leadsTo != PhotoLevelManager.Current && PhotoLevelManager.Instance != null)
                     PhotoLevelManager.Instance.GoTo(surface.leadsTo);
+                surface.OnCollision?.Invoke();
                 return;
             }
         }

@@ -297,6 +297,22 @@ public static class PhotoLevelBuilder
         Debug.Log("Photo Level: added " + Level8Name + ". Save the scene to keep it.");
     }
 
+    /// <summary>
+    /// Puts the grey guide dots into the open scene, so they can be seen and moved by hand
+    /// without pressing Play. Running it again lays every level's dots out afresh.
+    /// </summary>
+    [MenuItem("Tools/Photo Level/Create Guide Dots")]
+    public static void CreateGuideDots()
+    {
+        var manager = Object.FindAnyObjectByType<PhotoLevelManager>();
+        if (manager == null) { Debug.LogError("Photo Level: no PhotoLevelManager in the open scene."); return; }
+        var guide = manager.GetComponent<PhotoGuide>();
+        if (guide == null) guide = Undo.AddComponent<PhotoGuide>(manager.gameObject);
+        guide.Rebuild();
+        Selection.activeGameObject = manager.gameObject;
+        Debug.Log("Photo Level: guide dots created. Each level has a \"Guide Dots\" group. Save the scene to keep them.");
+    }
+
     // ───────────────────────── pieces ─────────────────────────
 
     /// <summary>
