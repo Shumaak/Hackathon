@@ -72,3 +72,6 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 /.vscode
+
+# Local photo archive exceeds GitHub's file size limit
+/Fotky/HEIC.7z
