@@ -1255,6 +1255,7 @@ MonoBehaviour:
   maxStrength: 2
   strengthMultiplier: 3.5
   GroundCheckDistance: 0.6
+  stillThreshold: 1.5
   layerMask:
     serializedVersion: 2
     m_Bits: 8
