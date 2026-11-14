@@ -178,22 +178,15 @@ public static class PhotoLevelBuilder
         var lamps2End =
         Ledge("Lamp End",             1295, 1430,  430,  1.3f);
 
-        var lamps3 = Level("Level 7 - Lamps", "Assets/Photos/IMG_2237.png", 1600, 1200, 100, 535, 490, 1.3f);
-        Ledge("Lamp Start",            465,  605,  490,  1.3f);
-        Ledge("Lamp 1",                605,  695,  545,  1.3f);
-        Ledge("Lamp 2",                680,  770,  565,  1.3f);
-        Ledge("Lamp 3",                895,  985,  568,  1.3f);
-        Ledge("Lamp 4",                980, 1075,  552,  1.3f);
-        var lamps3End =
-        Ledge("Lamp End",             1088, 1228,  500,  1.3f);
-
-        var lamps4 = Level("Level 8 - Lamps", "Assets/Photos/IMG_2238.png", 1600, 1200, 100, 558, 488, 1.3f);
+        var lamps3 = Level("Level 7 - Lamps", "Assets/Photos/IMG_2238.png", 1600, 1200, 100, 558, 488, 1.3f);
         Ledge("Lamp Start",            485,  630,  488,  1.3f);
         Ledge("Lamp 1",                628,  720,  543,  1.3f);
         Ledge("Lamp 2",                890,  985,  565,  1.3f);
         Ledge("Lamp 3",                965, 1055,  546,  1.3f);
-        var lamps4End =
+        var lamps3End =
         Ledge("Lamp End",             1100, 1250,  492,  1.3f);
+
+        var lamps4 = LampsLevel8(out var lamps4End);
 
         // The last lamp photo: from the right big lamp you can jump down onto the blue rail beside it.
         var lamps5 = Level("Level 9 - Lamps", "Assets/Photos/IMG_2239.png", 1600, 1200, 100, 477, 468, 1.3f);
@@ -235,6 +228,73 @@ public static class PhotoLevelBuilder
         Selection.activeGameObject = rootGo;
         EditorSceneManager.MarkSceneDirty(rootGo.scene);
         Debug.Log("Photo Level built: " + rootGo.GetComponentsInChildren<PhotoLevelArea>().Length + " levels, " + rootGo.GetComponentsInChildren<PhotoSurface>().Length + " surfaces.");
+    }
+
+    const string Level8Name = "Level 8 - Lamps";
+
+    /// <summary>The lamp photo between levels 7 and 9. Returns the level and its right big lamp.</summary>
+    static PhotoLevelArea LampsLevel8(out PhotoSurface end)
+    {
+        //     name                    x0    x1    top   ball scale
+        var area = Level(Level8Name, "Assets/Photos/IMG_2241.png", 1600, 1200, 100, 245, 446, 1.3f);
+        Ledge("Lamp Start",            165,  325,  446,  1.3f);
+        Ledge("Lamp 1",                362,  455,  499,  1.3f);
+        Ledge("Lamp 2",                455,  545,  521,  1.3f);
+        Ledge("Lamp 3",                915, 1005,  520,  1.3f);
+        Ledge("Lamp 4",               1040, 1135,  499,  1.3f);
+        Ledge("Lamp 5",               1135, 1225,  519,  1.3f);
+        end =
+        Ledge("Lamp End",             1335, 1495,  446,  1.3f);
+        return area;
+    }
+
+    /// <summary>
+    /// Adds only level 8 to the scene that is open, between "Level 7 - Lamps" and
+    /// "Level 9 - Lamps", leaving everything else in the scene exactly as it is. Running it
+    /// again replaces level 8, so the numbers in LampsLevel8 can be tuned and re-applied.
+    /// </summary>
+    [MenuItem("Tools/Photo Level/Add Level 8 To Open Scene")]
+    public static void AddLevel8()
+    {
+        var rootGo = GameObject.Find(RootName);
+        if (rootGo == null) { Debug.LogError("Photo Level: no " + RootName + " object in the open scene."); return; }
+        var areas = rootGo.GetComponentsInChildren<PhotoLevelArea>();
+        var before = areas.FirstOrDefault(a => a.name == "Level 7 - Lamps");
+        var after = areas.FirstOrDefault(a => a.name == "Level 9 - Lamps");
+        var old = areas.FirstOrDefault(a => a.name == Level8Name);
+        if (before == null || after == null) { Debug.LogError("Photo Level: the scene needs \"Level 7 - Lamps\" and \"Level 9 - Lamps\" to put level 8 between."); return; }
+
+        // Whatever in level 7 sends the ball onwards (its right big lamp) will lead to level 8 instead.
+        var entrances = before.GetComponentsInChildren<PhotoSurface>()
+            .Where(s => s.leadsTo == after || (old != null && s.leadsTo == old)).ToList();
+        if (entrances.Count == 0)
+            entrances = before.GetComponentsInChildren<PhotoSurface>().Where(s => s.name == "Lamp End").ToList();
+
+        root = rootGo.transform;
+        groundLayer = LayerMask.NameToLayer("Ground");
+        if (groundLayer < 0) groundLayer = 3;
+        surfaceMaterial = before.GetComponentInChildren<BoxCollider>().sharedMaterial as PhysicsMaterial;
+        // To the right of every other level, so nothing that is already there moves.
+        nextLevelX = areas.Where(a => a != old).Max(a => a.transform.localPosition.x + a.size.x) + LevelSpacing;
+        if (old != null) Undo.DestroyObjectImmediate(old.gameObject);
+
+        var level = LampsLevel8(out var end);
+        Undo.RegisterCreatedObjectUndo(level.gameObject, "Add Level 8");
+        level.transform.SetSiblingIndex(before.transform.GetSiblingIndex() + 1);
+        level.jumpHeight = before.jumpHeight;   // same as its neighbour, including any tuning done in the Inspector
+        level.below = before.below;
+        end.leadsTo = after;
+        foreach (var entrance in entrances)
+        {
+            Undo.RecordObject(entrance, "Add Level 8");
+            entrance.leadsTo = level;
+        }
+        Seal(level);
+
+        Selection.activeGameObject = level.gameObject;
+        EditorSceneManager.MarkSceneDirty(rootGo.scene);
+        if (entrances.Count == 0) Debug.LogWarning("Photo Level: nothing in level 7 leads onwards. Set Leads To on its last lamp to " + Level8Name + ".");
+        Debug.Log("Photo Level: added " + Level8Name + ". Save the scene to keep it.");
     }
 
     // ───────────────────────── pieces ─────────────────────────
