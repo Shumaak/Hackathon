@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class RubberBallController : MonoBehaviour
@@ -6,11 +7,11 @@ public class RubberBallController : MonoBehaviour
     private Rigidbody rb;
     private Camera cam;
     public bool inAir;
-
     [SerializeField] private float maxStrength = 5f;
     [SerializeField] private float strengthMultiplier = 5f;
     [SerializeField] private float GroundCheckDistance;
     [SerializeField] private LayerMask layerMask;
+    [SerializeField] private Transform arrow;
 
     void Start()
     {
@@ -20,7 +21,16 @@ public class RubberBallController : MonoBehaviour
 
     void OnMouseDrag()
     {
+        if (inAir) return;
+        
         dragOffset = transform.position - MouseWorldPosition();
+        UpdateArrow();
+    }
+
+    private void UpdateArrow()
+    {
+        arrow.transform.localScale = new Vector3(Mathf.Clamp(dragOffset.magnitude, 0, maxStrength), 1, 1);
+        arrow.right = -dragOffset.normalized;
     }
 
     void OnMouseUp()
@@ -38,7 +48,7 @@ public class RubberBallController : MonoBehaviour
 
     void Update()
     {
-        if (Physics.Raycast(transform.position , Vector3.down, GroundCheckDistance, layerMask))
+        if (Physics.Raycast(transform.position, Vector3.down, GroundCheckDistance, layerMask))
         {
             inAir = false;
         }
@@ -46,6 +56,8 @@ public class RubberBallController : MonoBehaviour
         {
             inAir = true;
         }
+
+        arrow.gameObject.SetActive(dragOffset != Vector2.zero && !inAir);
     }
 
     private Vector3 MouseWorldPosition()
