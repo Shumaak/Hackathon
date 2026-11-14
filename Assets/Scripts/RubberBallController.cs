@@ -32,7 +32,7 @@ public class RubberBallController : MonoBehaviour
     private void UpdateArrow()
     {
         arrow.transform.localScale = new Vector3(Mathf.Clamp(dragOffset.magnitude, 0, maxStrength), 1, 1);
-        arrow.right = dragOffset.normalized;
+        arrow.right = -dragOffset.normalized;
     }
 
     void OnMouseUp()
