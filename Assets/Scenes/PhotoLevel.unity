@@ -2129,7 +2129,7 @@ MonoBehaviour:
   size: {x: 16, y: 12}
   spawn: {fileID: 1541482947}
   spawnScale: 0.52
-  jumpHeight: 1.35
+  jumpHeight: 1.45
   above: {fileID: 0}
   below: {fileID: 849954389}
   right: {fileID: 0}
@@ -2631,7 +2631,7 @@ MonoBehaviour:
   size: {x: 16, y: 12}
   spawn: {fileID: 669253269}
   spawnScale: 0.52
-  jumpHeight: 1.35
+  jumpHeight: 1.45
   above: {fileID: 0}
   below: {fileID: 849954389}
   right: {fileID: 0}
@@ -4182,7 +4182,7 @@ MonoBehaviour:
   size: {x: 16, y: 12}
   spawn: {fileID: 1042454753}
   spawnScale: 0.52
-  jumpHeight: 1.35
+  jumpHeight: 1.45
   above: {fileID: 0}
   below: {fileID: 849954389}
   right: {fileID: 0}
@@ -5165,7 +5165,7 @@ MonoBehaviour:
   size: {x: 16, y: 12}
   spawn: {fileID: 1127327484}
   spawnScale: 0.52
-  jumpHeight: 1.35
+  jumpHeight: 1.8
   above: {fileID: 0}
   below: {fileID: 849954389}
   right: {fileID: 0}
@@ -6046,7 +6046,7 @@ MonoBehaviour:
   size: {x: 16, y: 12}
   spawn: {fileID: 1395256860}
   spawnScale: 0.52
-  jumpHeight: 1.35
+  jumpHeight: 1.8
   above: {fileID: 0}
   below: {fileID: 849954389}
   right: {fileID: 0}
