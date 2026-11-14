@@ -24,6 +24,8 @@ public class PhotoLevelManager : MonoBehaviour
     {
         Instance = this;
         Current = startLevel;
+        // The dotted line showing where to go.
+        if (GetComponent<PhotoGuide>() == null) gameObject.AddComponent<PhotoGuide>();
     }
 
     void Start()
