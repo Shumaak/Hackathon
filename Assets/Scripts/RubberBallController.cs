@@ -7,9 +7,12 @@ public class RubberBallController : MonoBehaviour
     private Rigidbody rb;
     private Camera cam;
     public bool inAir;
+    private bool still;
     [SerializeField] private float maxStrength = 5f;
     [SerializeField] private float strengthMultiplier = 5f;
     [SerializeField] private float GroundCheckDistance;
+    [SerializeField] private float stillThreshold;
+
     [SerializeField] private LayerMask layerMask;
     [SerializeField] private Transform arrow;
 
@@ -21,10 +24,9 @@ public class RubberBallController : MonoBehaviour
 
     void OnMouseDrag()
     {
-        if (inAir) return;
-        
+        if (inAir || !still) return;
+
         dragOffset = transform.position - MouseWorldPosition();
-        UpdateArrow();
     }
 
     private void UpdateArrow()
@@ -35,15 +37,15 @@ public class RubberBallController : MonoBehaviour
 
     void OnMouseUp()
     {
-        if (!inAir)
+        if (!inAir && still)
         {
             Vector2 direction = dragOffset.normalized;
             float strength = Mathf.Clamp(dragOffset.magnitude, 0, maxStrength);
             rb.AddForce(direction * strength * strengthMultiplier, ForceMode.Impulse);
             inAir = true;
 
-            dragOffset = Vector2.zero;
         }
+        dragOffset = Vector2.zero;
     }
 
     void Update()
@@ -57,7 +59,10 @@ public class RubberBallController : MonoBehaviour
             inAir = true;
         }
 
-        arrow.gameObject.SetActive(dragOffset != Vector2.zero && !inAir);
+        still = rb.linearVelocity.magnitude <= stillThreshold;
+        arrow.gameObject.SetActive(dragOffset != Vector2.zero || !inAir);
+
+        UpdateArrow();
     }
 
     private Vector3 MouseWorldPosition()
