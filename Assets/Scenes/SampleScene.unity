@@ -882,12 +882,24 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 2689095842505230360, guid: c04e091d450a7d132bdf5e5be4a59d0a, type: 3}
+      propertyPath: m_LinearDamping
+      value: 0.2
+      objectReference: {fileID: 0}
     - target: {fileID: 3207333310611881565, guid: c04e091d450a7d132bdf5e5be4a59d0a, type: 3}
       propertyPath: visuals
       value: 
       objectReference: {fileID: 863808343}
     - target: {fileID: 3207333310611881565, guid: c04e091d450a7d132bdf5e5be4a59d0a, type: 3}
+      propertyPath: maxStretch
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3207333310611881565, guid: c04e091d450a7d132bdf5e5be4a59d0a, type: 3}
       propertyPath: squishSpeed
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3207333310611881565, guid: c04e091d450a7d132bdf5e5be4a59d0a, type: 3}
+      propertyPath: impactSquish
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3207333310611881565, guid: c04e091d450a7d132bdf5e5be4a59d0a, type: 3}

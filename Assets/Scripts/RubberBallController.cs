@@ -18,6 +18,10 @@ public class RubberBallController : MonoBehaviour
 
     [SerializeField] private float maxStrength = 5f;
     [SerializeField] private float strengthMultiplier = 5f;
+    [Tooltip("The ball size at which a launch has its normal strength. A bigger ball jumps further, a smaller one less.")]
+    [SerializeField] private float sizeForNormalJump = 1f;
+    [Tooltip("Multiplies how high and far a launch goes. Photo levels set this per level.")]
+    public float jumpHeightMultiplier = 1f;
     [SerializeField] private float GroundCheckDistance;
     [SerializeField] private float stillThreshold;
     [SerializeField] private Transform visuals;
@@ -27,6 +31,8 @@ public class RubberBallController : MonoBehaviour
 
     [SerializeField] private LayerMask layerMask;
     [SerializeField] private Transform arrow;
+
+    private float BallScale => transform.lossyScale.y;
 
     void Start()
     {
@@ -52,8 +58,12 @@ public class RubberBallController : MonoBehaviour
         if (!inAir && still)
         {
             Vector2 direction = dragOffset.normalized;
+            // The drag distance for full power stays the same at any size, so it always fits
+            // on screen. A resized ball jumps in proportion to its size (relative to
+            // sizeForNormalJump): sqrt because jump height and distance grow with the square
+            // of launch speed.
             float strength = Mathf.Clamp(dragOffset.magnitude, 0, maxStrength);
-            rb.AddForce(direction * strength * strengthMultiplier, ForceMode.Impulse);
+            rb.AddForce(direction * strength * strengthMultiplier * Mathf.Sqrt(jumpHeightMultiplier * BallScale / sizeForNormalJump), ForceMode.Impulse);
             inAir = true;
 
         }
@@ -62,7 +72,7 @@ public class RubberBallController : MonoBehaviour
 
     void Update()
     {
-        if (Physics.Raycast(transform.position, Vector3.down, GroundCheckDistance, layerMask))
+        if (Physics.Raycast(transform.position, Vector3.down, GroundCheckDistance * BallScale, layerMask))
         {
             inAir = false;
         }
@@ -85,7 +95,6 @@ public class RubberBallController : MonoBehaviour
         float target = maxStretch * Mathf.Clamp01(velocity.magnitude / maxStretchAtMagnitude);
         deform = Mathf.Lerp(deform, target, squishReturnSpeed * Time.deltaTime);
 
-        // Once the impact squash has recovered, stretch along the travel direction again.
         if (deform >= 0f && velocity.magnitude > 0.5f)
             visuals.right = velocity.normalized;
 
@@ -107,6 +116,6 @@ public class RubberBallController : MonoBehaviour
     void OnDrawGizmos()
     {
         Gizmos.color = inAir ? Color.red : Color.green;
-        Gizmos.DrawLine(transform.position, transform.position + Vector3.down * GroundCheckDistance);
+        Gizmos.DrawLine(transform.position, transform.position + Vector3.down * GroundCheckDistance * BallScale);
     }
 }
