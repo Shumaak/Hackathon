@@ -4910,7 +4910,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speaker: "Mat\xFDsek"
-  text: "N\xE9\xE9\xE9\xE9\xE9\xE9\xE9, m\u016Fj hop\xEDk"
+  text: "Nooooooo, my bouncy ball"
   photo: {fileID: 1303359952}
 --- !u!1 &375472989
 GameObject:
@@ -7340,7 +7340,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 931f33f5525bb613a5a7d0e28115dd9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speaker: "Hop\xEDk"
+  speaker: "Bouncy Ball"
   text: "\u2026"
   photo: {fileID: 1248087410}
 --- !u!1 &582122241
@@ -10838,7 +10838,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "<b>Nebu\u010F jako on!</b>\n<b>S n\u011Bk\xFDm se pora\u010F!</b>\n\n<color=#FFA500><size=120><b>116 111</b></size>\n<size=56>www.linkabezpeci.cz</size></color>"
+  m_text: "<b>Don't be like him!</b>\n<b>Talk to someone!</b>\n\n<color=#FFA500><size=120><b>116 111</b></size>\n<size=56>www.linkabezpeci.cz</size></color>"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -11244,7 +11244,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speaker: "Mat\xFDsek"
-  text: "<i>F\xDA\xDA\xDA\xDA\xDA\xDA\xDA\xDA\xDA\xDA\xDA\xDA\xDA\xDA\xDA\xDA\xDA\xDA\xDA\xDA\xDA\xDA\xDA</i>"
+  text: "<i>PHEWWWWWWWWWWWWWWWWWWWWW</i>"
   photo: {fileID: 416737505}
 --- !u!1 &979678796
 GameObject:
@@ -11791,7 +11791,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speaker: "Mat\xFDsek"
-  text: "Jsi m\u016Fj nejobl\xEDben\u011Bj\u0161\xED hop\xEDk"
+  text: "You're my favourite bouncy ball"
   photo: {fileID: 1248087410}
 --- !u!1 &1040189358
 GameObject:
@@ -15092,7 +15092,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 931f33f5525bb613a5a7d0e28115dd9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speaker: "Hop\xEDk"
+  speaker: "Bouncy Ball"
   text: "\u2026"
   photo: {fileID: 1248087410}
 --- !u!1 &1299298973
@@ -20879,7 +20879,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speaker: "Mat\xFDsek"
-  text: "J\xE1 jsem v\u011Bd\u011Bl, \u017Ee m\u011B m\xE1\u0161 taky r\xE1d"
+  text: "I knew you loved me too"
   photo: {fileID: 1248087410}
 --- !u!1 &1994518130
 GameObject:
@@ -21447,7 +21447,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speaker: "Mat\xFDsek"
-  text: "J\xE1 chci sv\xFDho hop\xEDka... HOP\xCDKUUUUUU"
+  text: "I want my bouncy ball... BOUNCY BAAAAAALL"
   photo: {fileID: 549103232}
 --- !u!1 &2034757158
 GameObject:
