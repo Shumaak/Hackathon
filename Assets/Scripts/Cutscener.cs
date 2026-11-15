@@ -80,7 +80,6 @@ public class Cutscener : MonoBehaviour
 
         while (true)
         {
-            // The end cutscene stays on its last part.
             if (ending && currentIndex >= playingParts.Count - 1)
                 break;
 
@@ -90,7 +89,6 @@ public class Cutscener : MonoBehaviour
             {
                 if (Input.GetMouseButtonDown(0))
                 {
-                    // The first click finishes a line that is still typing, the next one moves on.
                     if (dialogWindow != null && dialogWindow.IsTyping)
                         dialogWindow.Complete();
                     else
@@ -101,13 +99,11 @@ public class Cutscener : MonoBehaviour
                 yield return null;
             }
 
-            // Don't let the same click skip the next part too.
             yield return null;
 
             currentIndex++;
             bool finished = currentIndex >= playingParts.Count;
 
-            // Lines spoken over the same photo follow each other without the black fade.
             CutsceneDialogLine next = LineAt(currentIndex);
             bool samePhoto = line != null && next != null && line.photo == next.photo;
 
@@ -145,7 +141,6 @@ public class Cutscener : MonoBehaviour
         for (int i = 0; i < playingParts.Count; i++)
             playingParts[i].SetActive(i == currentIndex);
 
-        // A dialogue line has no picture of its own: it shows its photo with the window on top.
         if (line != null && line.photo != null)
             line.photo.SetActive(true);
 
@@ -213,7 +208,6 @@ public class Cutscener : MonoBehaviour
         if (fadeImage != null)
             return;
 
-        // Full-screen black overlay drawn above everything else.
         var canvasObject = new GameObject("CutsceneFade", typeof(Canvas));
         var canvas = canvasObject.GetComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;

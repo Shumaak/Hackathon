@@ -2,11 +2,6 @@ using System.Collections;
 using Unity.Cinemachine;
 using UnityEngine;
 
-/// <summary>
-/// Tracks which photo the ball is in. When the ball leaves through the top or the right edge,
-/// falls out of the bottom, or lands on a surface that leads to another level, fades to black,
-/// moves it to that level's spawn point and fades back in.
-/// </summary>
 public class PhotoLevelManager : MonoBehaviour
 {
     public static PhotoLevelArea Current { get; private set; }
@@ -15,7 +10,7 @@ public class PhotoLevelManager : MonoBehaviour
     [SerializeField] private PhotoLevelArea startLevel;
     [SerializeField] private float fadeTime = 0.35f;
 
-    float fade;          // 0 = clear, 1 = black
+    float fade;
     bool transitioning;
 
     public void SetStartLevel(PhotoLevelArea level) => startLevel = level;
@@ -24,14 +19,11 @@ public class PhotoLevelManager : MonoBehaviour
     {
         Instance = this;
         Current = startLevel;
-        // The dotted line showing where to go.
         if (GetComponent<PhotoGuide>() == null) gameObject.AddComponent<PhotoGuide>();
     }
 
     void Start()
     {
-        // Put the ball on whichever level is set as the start, so changing Start Level
-        // in the Inspector is all it takes to begin somewhere else.
         var ball = PhotoBall.Instance;
         if (ball != null && Current != null) PlaceBall(ball, Current, Current.spawn != null ? Current.spawn : Current.transform);
     }
@@ -46,7 +38,6 @@ public class PhotoLevelManager : MonoBehaviour
         ball.transform.position = position;
         ball.GetComponent<Rigidbody>().position = position;
 
-        // Make the camera cut to the new place instead of flying over to it.
         foreach (var cam in FindObjectsByType<CinemachineCamera>(FindObjectsSortMode.None))
             cam.PreviousStateIsValid = false;
     }
@@ -64,10 +55,6 @@ public class PhotoLevelManager : MonoBehaviour
         if (Instance == this) Instance = null;
     }
 
-    /// <summary>
-    /// Fade to black (or cut, if the level has shouldFadeBlack off) and move the ball to the given level's spawn point. The level may be
-    /// the one the ball is already in, which just puts it back on the spawn point.
-    /// </summary>
     public void GoTo(PhotoLevelArea level, Transform spawnPoint = null)
     {
         var ball = PhotoBall.Instance;
@@ -97,7 +84,6 @@ public class PhotoLevelManager : MonoBehaviour
         body.angularVelocity = Vector3.zero;
         body.isKinematic = true;
 
-        // A level with shouldFadeBlack off is cut to: the fade never leaves 0.
         while (level.shouldFadeBlack && fade < 1f)
         {
             fade = Mathf.MoveTowards(fade, 1f, Time.unscaledDeltaTime / fadeTime);

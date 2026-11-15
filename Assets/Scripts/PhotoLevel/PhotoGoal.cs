@@ -2,7 +2,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// <summary>The black slide hole: the ball gets sucked in and the run ends. R restarts.</summary>
 [RequireComponent(typeof(Collider))]
 public class PhotoGoal : MonoBehaviour
 {

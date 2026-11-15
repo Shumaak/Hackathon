@@ -1,11 +1,6 @@
 using Unity.Cinemachine;
 using UnityEngine;
 
-/// <summary>
-/// Goes on the CinemachineCamera. Keeps the view inside the current level's photo, so the
-/// camera never shows anything beyond the picture's edges. The camera keeps its normal
-/// distance; it only moves closer if the window is so wide that the view would not fit.
-/// </summary>
 public class PhotoCameraConfiner : CinemachineExtension
 {
     protected override void PostPipelineStageCallback(

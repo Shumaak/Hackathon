@@ -1,11 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// One photo = one level. The level's rectangle starts at this object's position
-/// (its bottom-left corner) and is `size` big. Leaving through the top goes to `above`,
-/// off the right or left edge goes to `right` or `left`, and falling out of the bottom
-/// goes to `below`; a side with no level is walled off.
-/// </summary>
 public class PhotoLevelArea : MonoBehaviour
 {
     public Vector2 size = new Vector2(16f, 12f);

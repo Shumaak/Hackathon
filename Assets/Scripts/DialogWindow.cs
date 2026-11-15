@@ -1,10 +1,6 @@
 using TMPro;
 using UnityEngine;
 
-/// <summary>
-/// The dialogue box: the speaker's name and a line of text that types itself out. Runs on unscaled
-/// time, so it works while the cutscene has the game paused.
-/// </summary>
 public class DialogWindow : MonoBehaviour
 {
     [SerializeField] private TMP_Text nameText;
@@ -16,7 +12,6 @@ public class DialogWindow : MonoBehaviour
     private float shown;
     private int total;
 
-    /// <summary>True while the line is still typing out.</summary>
     public bool IsTyping => gameObject.activeSelf && shown < total;
 
     public void Show(string speaker, string text)
@@ -36,7 +31,6 @@ public class DialogWindow : MonoBehaviour
         lineText.maxVisibleCharacters = (int)shown;
     }
 
-    /// <summary>Show the rest of the line at once.</summary>
     public void Complete()
     {
         shown = total;

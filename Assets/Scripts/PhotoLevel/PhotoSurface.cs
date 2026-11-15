@@ -1,12 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-/// <summary>
-/// An invisible collider traced over something in a photo (a counter, a rail, a lamp).
-/// ballScale is how big the ball should be while it stands here, so it matches how large
-/// that object appears in the photo. oneWay lets the ball jump up through it from below
-/// and land on top, which is what makes thin things like rails and shelves usable.
-/// </summary>
 [RequireComponent(typeof(Collider))]
 public class PhotoSurface : MonoBehaviour
 {
@@ -34,12 +28,10 @@ public class PhotoSurface : MonoBehaviour
         float top = col.bounds.max.y;
         if (ignoring)
         {
-            // Solid only once the whole ball is above the top.
             if (ball.Bottom >= top - 0.05f * ball.Scale) SetIgnoring(false);
         }
         else if (ball.transform.position.y < top)
         {
-            // The ball dropped off the side and is now below: let it pass again.
             SetIgnoring(true);
         }
     }

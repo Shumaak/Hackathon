@@ -1,23 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Draws a dotted line of grey dots through every photo level, showing where to go: from the
-/// spawn point, hopping from surface to surface, to the surface that leads to the next level
-/// (or to the right edge when the next level is off to the right).
-///
-/// To see and edit the dots before pressing Play: Tools > Photo Level > Create Guide Dots (or
-/// "Rebuild Dots" in this component's menu). That puts the dots in the scene as ordinary
-/// objects, a "Guide Dots" group inside each level, which can be moved, deleted or added to by
-/// hand. Rebuilding replaces them with a fresh line worked out from the level's PhotoSurfaces.
-///
-/// A level that has no "Guide Dots" group gets its line worked out when the game starts.
-/// </summary>
 public class PhotoGuide : MonoBehaviour
 {
     [SerializeField] private Color color = new Color(0.55f, 0.55f, 0.55f, 0.9f);
-    [SerializeField] private float dotSize = 0.12f;      // metres across
-    [SerializeField] private float spacing = 0.7f;       // metres between dots
+    [SerializeField] private float dotSize = 0.12f;
+    [SerializeField] private float spacing = 0.7f;
     [Tooltip("Surfaces narrower than this (lamps) are always landed on in the middle.")]
     [SerializeField] private float narrow = 2f;
     [Tooltip("How much the route avoids moving sideways. Higher = straighter lines, even if that means bigger jumps.")]
@@ -41,11 +29,9 @@ public class PhotoGuide : MonoBehaviour
 
     void Start()
     {
-        // Levels whose dots are already in the scene keep them exactly as they were set up.
         Build(false);
     }
 
-    /// <summary>Throws away the dots of every level and lays them out again. Works without pressing Play.</summary>
     [ContextMenu("Rebuild Dots")]
     public void Rebuild()
     {
@@ -56,12 +42,10 @@ public class PhotoGuide : MonoBehaviour
     {
         dot = null;
 #if UNITY_EDITOR
-        // In the editor the dots are saved with the scene, so they need a sprite that is a real asset.
         if (!Application.isPlaying) dot = UnityEditor.AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
 #endif
         if (dot == null) dot = MakeDot();
 
-        // Same material as the ball's picture, drawn just behind it.
         var ball = FindAnyObjectByType<PhotoBall>();
         var ballPicture = ball != null ? ball.GetComponentInChildren<SpriteRenderer>() : null;
         if (ballPicture != null)
@@ -87,7 +71,6 @@ public class PhotoGuide : MonoBehaviour
         }
     }
 
-    /// <summary>The world-space left, right and top of a surface. Worked out from the box itself, so it is right in the editor too.</summary>
     static void Extent(PhotoSurface surface, out float x0, out float x1, out float top)
     {
         var box = surface.GetComponent<BoxCollider>();
@@ -104,10 +87,8 @@ public class PhotoGuide : MonoBehaviour
         top = centre.y + Mathf.Abs(half.y);
     }
 
-    /// <summary>The line the ball's underside follows through a level, or null if it leads nowhere.</summary>
     List<Vector2> Route(PhotoLevelArea area)
     {
-        // Everything that can be stood on inside the photo (this leaves out the outer walls).
         var tops = new List<Top>();
         foreach (var surface in area.GetComponentsInChildren<PhotoSurface>())
         {
@@ -118,7 +99,6 @@ public class PhotoGuide : MonoBehaviour
         }
         if (tops.Count == 0) return null;
 
-        // Start on whatever is under the spawn point.
         Vector2 spawn = area.spawn != null ? area.spawn.position : area.transform.position;
         float footY = spawn.y - 0.5f * area.spawnScale;
         int start = -1;
@@ -129,15 +109,10 @@ public class PhotoGuide : MonoBehaviour
         }
         if (start < 0) return null;
 
-        // Cheapest chain of hops to every surface. A hop costs its length squared, so the
-        // route prefers several short hops over one long leap, plus extra for moving sideways,
-        // so it goes straight up or straight across where the ball can make the jump.
         var cost = new float[tops.Count];
         var from = new int[tops.Count];
-        var at = new float[tops.Count];      // where the ball stands on each surface when it gets there
+        var at = new float[tops.Count];
         var done = new bool[tops.Count];
-        // First only with hops the ball can make. If that reaches no way out, any hop is
-        // allowed, so a level always gets a line rather than none.
         int target = -1;
         bool toRightEdge = false;
         for (int attempt = 0; attempt < 2 && target < 0; attempt++)
@@ -158,9 +133,6 @@ public class PhotoGuide : MonoBehaviour
                 if (done[i]) continue;
                 float gap = Mathf.Max(0f, tops[i].x0 - tops[best].x1, tops[best].x0 - tops[i].x1);
                 float rise = tops[i].y - tops[best].y;
-                // Too high or too far for the ball as it is on this surface: a full-strength
-                // launch that tops out at `reach` gets to a point `gap` away and `rise` up
-                // only if reach >= (rise + distance) / 2.
                 float reach = jumpReach * area.jumpHeight * tops[best].surface.ballScale;
                 if (!anyHop && rise + Mathf.Sqrt(rise * rise + gap * gap) > 2f * reach) continue;
                 Hop(tops[best], tops[i], at[best], out _, out float landX);
@@ -170,7 +142,6 @@ public class PhotoGuide : MonoBehaviour
             }
         }
 
-        // Where the level is left: a surface that leads to another level, else the right edge.
         bool anyExit = false;
         for (int i = 0; i < tops.Count; i++)
         {
@@ -194,7 +165,6 @@ public class PhotoGuide : MonoBehaviour
         var chain = new List<int>();
         for (int i = target; i >= 0; i = from[i]) chain.Insert(0, i);
 
-        // Walk along each surface to where the next hop starts, then arc over to the next one.
         var path = new List<Vector2>();
         var current = new Vector2(spawn.x, tops[start].y);
         path.Add(current);
@@ -220,7 +190,6 @@ public class PhotoGuide : MonoBehaviour
         return path;
     }
 
-    /// <summary>Where a hop from one surface to another starts and ends, for a ball standing at x: straight up or down when one is above the other.</summary>
     void Hop(Top a, Top b, float x, out float takeOffX, out float landX)
     {
         float lo = Mathf.Max(a.x0, b.x0), hi = Mathf.Min(a.x1, b.x1);
@@ -228,7 +197,6 @@ public class PhotoGuide : MonoBehaviour
         landX = Stand(b, takeOffX);
     }
 
-    /// <summary>Where on a surface the ball stands when it wants to be at x: the middle of a lamp, otherwise a little in from the edge.</summary>
     float Stand(Top top, float x)
     {
         if (top.Width < narrow) return top.Centre;
@@ -247,11 +215,11 @@ public class PhotoGuide : MonoBehaviour
             UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(holder.gameObject.scene);
         }
 #endif
-        float scale = dotSize / dot.bounds.size.x;   // whatever size the sprite is, the dot comes out dotSize across
-        float lift = 0.5f * area.spawnScale;   // the line follows the middle of the ball, not its underside
+        float scale = dotSize / dot.bounds.size.x;
+        float lift = 0.5f * area.spawnScale;
         float z = area.transform.position.z;
 
-        float untilNext = spacing;             // the first dot is one step away from the ball
+        float untilNext = spacing;
         for (int i = 1; i < path.Count; i++)
         {
             Vector2 a = path[i - 1], b = path[i];
@@ -275,7 +243,6 @@ public class PhotoGuide : MonoBehaviour
         }
     }
 
-    /// <summary>A white, soft-edged circle exactly one unit wide.</summary>
     static Sprite MakeDot()
     {
         const int size = 64;

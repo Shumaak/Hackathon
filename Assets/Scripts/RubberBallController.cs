@@ -9,7 +9,7 @@ public class RubberBallController : MonoBehaviour
     public bool inAir;
     private bool still;
 
-    private float deform; // 0 = round, >0 stretched, <0 squashed
+    private float deform;
 
     [Header("Squish")]
     [SerializeField] private float maxStretch = 0.3f;
@@ -60,7 +60,6 @@ public class RubberBallController : MonoBehaviour
         arrow.transform.localScale = new Vector3(Mathf.Clamp(dragOffset.magnitude, 0, maxStrength), 1, 1);
         arrow.right = -dragOffset.normalized;
 
-        // Green at no charge, yellow at half, red at full.
         float charge = maxStrength > 0f ? Mathf.Clamp01(dragOffset.magnitude / maxStrength) : 1f;
         Color color = charge < 0.5f
             ? Color.Lerp(weakColor, mediumColor, charge * 2f)
@@ -74,10 +73,6 @@ public class RubberBallController : MonoBehaviour
         if (!inAir && still)
         {
             Vector2 direction = dragOffset.normalized;
-            // The drag distance for full power stays the same at any size, so it always fits
-            // on screen. A resized ball jumps in proportion to its size (relative to
-            // sizeForNormalJump): sqrt because jump height and distance grow with the square
-            // of launch speed.
             float strength = Mathf.Clamp(dragOffset.magnitude, 0, maxStrength);
             rb.AddForce(direction * strength * strengthMultiplier * Mathf.Sqrt(jumpHeightMultiplier * BallScale / sizeForNormalJump), ForceMode.Impulse);
             inAir = true;
