@@ -32,12 +32,20 @@ public class RubberBallController : MonoBehaviour
     [SerializeField] private LayerMask layerMask;
     [SerializeField] private Transform arrow;
 
+    [Header("Arrow colour by charge")]
+    [SerializeField] private Color weakColor = new Color(0.2f, 0.85f, 0.2f);
+    [SerializeField] private Color mediumColor = new Color(1f, 0.85f, 0.1f);
+    [SerializeField] private Color fullColor = new Color(1f, 0.15f, 0.1f);
+
+    private SpriteRenderer[] arrowPictures;
+
     private float BallScale => transform.lossyScale.y;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         cam = Camera.main;
+        arrowPictures = arrow.GetComponentsInChildren<SpriteRenderer>(true);
     }
 
     void OnMouseDrag()
@@ -51,6 +59,14 @@ public class RubberBallController : MonoBehaviour
     {
         arrow.transform.localScale = new Vector3(Mathf.Clamp(dragOffset.magnitude, 0, maxStrength), 1, 1);
         arrow.right = -dragOffset.normalized;
+
+        // Green at no charge, yellow at half, red at full.
+        float charge = maxStrength > 0f ? Mathf.Clamp01(dragOffset.magnitude / maxStrength) : 1f;
+        Color color = charge < 0.5f
+            ? Color.Lerp(weakColor, mediumColor, charge * 2f)
+            : Color.Lerp(mediumColor, fullColor, charge * 2f - 1f);
+        foreach (SpriteRenderer picture in arrowPictures)
+            picture.color = color;
     }
 
     void OnMouseUp()
