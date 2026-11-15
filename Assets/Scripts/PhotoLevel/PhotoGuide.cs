@@ -17,7 +17,7 @@ public class PhotoGuide : MonoBehaviour
 {
     [SerializeField] private Color color = new Color(0.55f, 0.55f, 0.55f, 0.9f);
     [SerializeField] private float dotSize = 0.12f;      // metres across
-    [SerializeField] private float spacing = 0.35f;      // metres between dots
+    [SerializeField] private float spacing = 0.7f;       // metres between dots
     [Tooltip("Surfaces narrower than this (lamps) are always landed on in the middle.")]
     [SerializeField] private float narrow = 2f;
     [Tooltip("How much the route avoids moving sideways. Higher = straighter lines, even if that means bigger jumps.")]

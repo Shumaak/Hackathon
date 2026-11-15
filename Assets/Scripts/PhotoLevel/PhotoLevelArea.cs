@@ -13,6 +13,8 @@ public class PhotoLevelArea : MonoBehaviour
     public float spawnScale = 1f;
     [Tooltip("How much higher than normal the ball jumps in this level (2 = twice as high).")]
     public float jumpHeight = 1f;
+    [Tooltip("Fade through black when the ball arrives in this level (also when it is put back on the spawn point). Off = straight cut.")]
+    public bool shouldFadeBlack = true;
     public PhotoLevelArea above;
     public PhotoLevelArea below;
     public PhotoLevelArea right;

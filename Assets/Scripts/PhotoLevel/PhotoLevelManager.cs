@@ -65,7 +65,7 @@ public class PhotoLevelManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Fade to black and move the ball to the given level's spawn point. The level may be
+    /// Fade to black (or cut, if the level has shouldFadeBlack off) and move the ball to the given level's spawn point. The level may be
     /// the one the ball is already in, which just puts it back on the spawn point.
     /// </summary>
     public void GoTo(PhotoLevelArea level, Transform spawnPoint = null)
@@ -97,7 +97,8 @@ public class PhotoLevelManager : MonoBehaviour
         body.angularVelocity = Vector3.zero;
         body.isKinematic = true;
 
-        while (fade < 1f)
+        // A level with shouldFadeBlack off is cut to: the fade never leaves 0.
+        while (level.shouldFadeBlack && fade < 1f)
         {
             fade = Mathf.MoveTowards(fade, 1f, Time.unscaledDeltaTime / fadeTime);
             yield return null;
