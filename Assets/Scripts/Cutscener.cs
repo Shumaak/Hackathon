@@ -11,9 +11,16 @@ public class Cutscener : MonoBehaviour
     public GameObject StartBG;
     public GameObject EndBG;
 
+    [Tooltip("Shows the text of parts that are dialogue lines (objects with a CutsceneDialogLine).")]
+    [SerializeField] private DialogWindow dialogWindow;
+
     [SerializeField] private float cutscenePartTime = 2.5f;
+    [Tooltip("Seconds a dialogue line stays up before moving on by itself. A click moves on sooner.")]
+    [SerializeField] private float dialogPartTime = 4f;
     [Tooltip("Seconds for one fade to black (and the same again for the fade back in). 0 = instant cut.")]
     [SerializeField][Min(0)] private float fadeTime = 0.4f;
+    [Tooltip("Seconds to wait after PlayEnd is called before the end cutscene starts. The game keeps running meanwhile.")]
+    [SerializeField][Min(0)] private float endDelay = 0.5f;
     [SerializeField][ReadOnly] private float cutscenePartTimer;
     [SerializeField][ReadOnly] private int currentIndex;
 
@@ -30,7 +37,13 @@ public class Cutscener : MonoBehaviour
 
     public void PlayStart() => Play(StartCutsceneParts, StartBG);
 
-    public void PlayEnd() => Play(EndCutsceneParts, EndBG, true);
+    public void PlayEnd()
+    {
+        if (ending && routine != null)
+            return;
+
+        Play(EndCutsceneParts, EndBG, true);
+    }
 
     private void Play(List<GameObject> parts, GameObject bg, bool end = false)
     {
@@ -38,7 +51,6 @@ public class Cutscener : MonoBehaviour
             StopCoroutine(routine);
 
         ending = end;
-        Time.timeScale = 0;
         routine = StartCoroutine(Run(parts, bg));
     }
 
@@ -46,7 +58,11 @@ public class Cutscener : MonoBehaviour
     {
         EnsureFadeImage();
 
-        // The start cutscene opens from black; the end one fades the gameplay out first.
+        if (ending && endDelay > 0)
+            yield return new WaitForSecondsRealtime(endDelay);
+
+        Time.timeScale = 0;
+
         if (ending)
             yield return Fade(1);
         else
@@ -64,9 +80,23 @@ public class Cutscener : MonoBehaviour
 
         while (true)
         {
-            cutscenePartTimer = cutscenePartTime;
-            while (cutscenePartTimer > 0 && !Input.GetMouseButtonDown(0))
+            // The end cutscene stays on its last part.
+            if (ending && currentIndex >= playingParts.Count - 1)
+                break;
+
+            CutsceneDialogLine line = LineAt(currentIndex);
+            cutscenePartTimer = line != null ? dialogPartTime : cutscenePartTime;
+            while (cutscenePartTimer > 0)
             {
+                if (Input.GetMouseButtonDown(0))
+                {
+                    // The first click finishes a line that is still typing, the next one moves on.
+                    if (dialogWindow != null && dialogWindow.IsTyping)
+                        dialogWindow.Complete();
+                    else
+                        break;
+                }
+
                 cutscenePartTimer -= Time.unscaledDeltaTime;
                 yield return null;
             }
@@ -77,14 +107,20 @@ public class Cutscener : MonoBehaviour
             currentIndex++;
             bool finished = currentIndex >= playingParts.Count;
 
-            yield return Fade(1);
+            // Lines spoken over the same photo follow each other without the black fade.
+            CutsceneDialogLine next = LineAt(currentIndex);
+            bool samePhoto = line != null && next != null && line.photo == next.photo;
+
+            if (!samePhoto)
+                yield return Fade(1);
 
             if (finished && !ending)
                 Stop();
             else
                 ShowCurrentPart();
 
-            yield return Fade(0);
+            if (!samePhoto)
+                yield return Fade(0);
 
             if (finished)
                 break;
@@ -93,18 +129,55 @@ public class Cutscener : MonoBehaviour
         routine = null;
     }
 
+    private CutsceneDialogLine LineAt(int index)
+    {
+        if (playingParts == null || index < 0 || index >= playingParts.Count || playingParts[index] == null)
+            return null;
+
+        return playingParts[index].GetComponent<CutsceneDialogLine>();
+    }
+
     private void ShowCurrentPart()
     {
+        CutsceneDialogLine line = LineAt(currentIndex);
+
+        HideLinePhotos();
         for (int i = 0; i < playingParts.Count; i++)
             playingParts[i].SetActive(i == currentIndex);
+
+        // A dialogue line has no picture of its own: it shows its photo with the window on top.
+        if (line != null && line.photo != null)
+            line.photo.SetActive(true);
+
+        if (dialogWindow == null)
+            return;
+
+        if (line != null)
+            dialogWindow.Show(line.speaker, line.text);
+        else
+            dialogWindow.Hide();
+    }
+
+    private void HideLinePhotos()
+    {
+        for (int i = 0; i < playingParts.Count; i++)
+        {
+            CutsceneDialogLine line = LineAt(i);
+            if (line != null && line.photo != null)
+                line.photo.SetActive(false);
+        }
     }
 
     private void Stop()
     {
         Time.timeScale = 1;
 
+        HideLinePhotos();
         foreach (GameObject part in playingParts)
             part.SetActive(false);
+
+        if (dialogWindow != null)
+            dialogWindow.Hide();
 
         if (playingBG != null)
             playingBG.SetActive(false);
